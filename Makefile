@@ -65,7 +65,7 @@ test-docker: test-container
 test-container: $(BUILDFILE) $(RESULTS_DIR)
 	$(CONTAINER_CMD) run $(CONTAINER_OPTS) --rm --hostname test_ceph_aio \
 		-v $(CURDIR):/go/src/github.com/ceph/go-ceph$(VOLUME_FLAGS) $(RESULTS_VOLUME) $(GOCACHE_VOLUME) \
-		$(CI_IMAGE_TAG) $(ENTRYPOINT_ARGS)
+		$(CI_IMAGE_TAG) --test-pkg=scratch
 test-multi-container: $(BUILDFILE) $(RESULTS_DIR)
 	-$(MAKE) test-containers-kill
 	-$(MAKE) test-containers-rm-volumes
