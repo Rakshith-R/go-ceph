@@ -63,15 +63,16 @@ func TestGetMirrorUUID(t *testing.T) {
 		conn.Shutdown()
 	}()
 
-	ioctx, err := conn.OpenIOContext(poolName)
-	assert.NoError(t, err)
-	defer func() {
-		ioctx.Destroy()
-	}()
-	for i := range []int{1, 2, 3, 5} {
+	for i := range []int{1, 2, 3, 5, 0, 0, 0, 0} {
 
 		name1 := "img" + strconv.Itoa(i)
 		go func(name1 string) {
+			conn := radosConnect(t)
+			ioctx, err := conn.OpenIOContext(poolName)
+			assert.NoError(t, err)
+			defer func() {
+				ioctx.Destroy()
+			}()
 			fmt.Printf("creating %s\n", name1)
 			options := NewRbdImageOptions()
 			err = CreateImage(ioctx, name1, uint64(100), options)
