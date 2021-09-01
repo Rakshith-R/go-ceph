@@ -28,7 +28,7 @@ ENV GODEBUG=cgocheck=2
 ENV GOCACHE=/go/cache
 WORKDIR /go/src/github.com/ceph/go-ceph
 VOLUME /go/src/github.com/ceph/go-ceph
-
+# COPY ceph.conf /tmp/ceph.conf
 COPY micro-osd.sh /
 COPY entrypoint.sh /
 ENTRYPOINT ["/entrypoint.sh"]

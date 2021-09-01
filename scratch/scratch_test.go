@@ -54,7 +54,25 @@ func waitForRadosConn(t *testing.T, conn *rados.Conn) {
 }
 
 func TestGetMirrorUUID(t *testing.T) {
+	// CephConfigPath := "/tmp/ceph/ceph.conf"
+	// dat, err := os.ReadFile(CephConfigPath)
+	// fmt.Print(err)
+	// fmt.Print(string(dat))
 	conn := radosConnect(t)
+	conn.SetConfigOption("debug_rbd", "20")
+
+	conn.SetConfigOption("debug_client", "20")
+
+	conn.SetConfigOption("debug client", "20")
+
+	conn.SetConfigOption("debug_librbd", "20")
+	conn.SetConfigOption("debug librbd", "20")
+	conn.SetConfigOption("debug_ms", "1")
+	conn.SetConfigOption("debug ms", "1")
+	conn.SetConfigOption("log_file", "/tmp/ceph/log/client.log")
+	conn.SetConfigOption("debug rbd", "20")
+
+	conn.SetConfigOption("log file", "/tmp/ceph/log/client.log")
 	poolName := "a"
 	err := conn.MakePool(poolName)
 	require.NoError(t, err)
@@ -63,17 +81,16 @@ func TestGetMirrorUUID(t *testing.T) {
 		conn.Shutdown()
 	}()
 
-	for i := range []int{1, 2, 3, 5, 0, 0, 0, 0} {
+	for i := range []int{1, 2, 3} {
 
 		name1 := "img" + strconv.Itoa(i)
 		go func(name1 string) {
-			conn := radosConnect(t)
 			ioctx, err := conn.OpenIOContext(poolName)
 			assert.NoError(t, err)
 			defer func() {
 				ioctx.Destroy()
 			}()
-			fmt.Printf("creating %s\n", name1)
+			fmt.Printf("1creating %s\n", name1)
 			options := NewRbdImageOptions()
 			err = CreateImage(ioctx, name1, uint64(100), options)
 			require.NoError(t, err)
@@ -81,6 +98,6 @@ func TestGetMirrorUUID(t *testing.T) {
 			fmt.Printf("done creating %s\n", name1)
 		}(name1)
 	}
-	time.Sleep(time.Second * 30)
+	time.Sleep(time.Second * 200)
 	panic("hello")
 }

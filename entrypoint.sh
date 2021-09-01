@@ -143,6 +143,13 @@ wait_for_files() {
 }
 
 test_failed() {
+    ls /tmp/ceph/log
+    
+    cat /tmp/ceph/log/rbd-mirror.log
+    cat /tmp/ceph/log/client.log
+    cp -R /tmp/ceph/log/* ./logs/
+    cat ${CEPH_CONF}
+    cp ${CEPH_CONF} .
     local pkg="${1}"
     echo "*** ERROR: ${pkg} tests failed"
     pause_if_needed
@@ -220,7 +227,7 @@ test_pkg() {
         testargs+=("-memprofile" "${pkg}.mem.out")
     fi
 
-    show go test -v "${testargs[@]}" "./${pkg}"
+    show go test -v "${testargs[@]}" -timeout 5m "./${pkg}"
     ret=$(($?+${ret}))
     grep -v "^mode: count" "${pkg}.cover.out" >> "cover.out"
     return ${ret}
@@ -274,9 +281,13 @@ test_go_ceph() {
         setup_mirroring
         export MIRROR_CONF
     fi
+    # mv /tmp/ceph.conf /tmp/ceph/ceph.conf
+    # cat $CEPH_CONF
+    # ls -R | grep client.log
     for pkg in ${pkgs}; do
         test_pkg "${pkg}" || test_failed "${pkg}"
     done
+    cat /var/log/ceph/rbd-mirror.log
     post_all_tests
 }
 
