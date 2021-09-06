@@ -4,7 +4,7 @@ CONTAINER_OPTS := --security-opt $(shell grep -q selinux /sys/kernel/security/ls
 CONTAINER_BUILD_OPTS :=
 CONTAINER_CONFIG_DIR := testing/containers/ceph
 VOLUME_FLAGS :=
-CEPH_VERSION := octopus
+CEPH_VERSION := pacific
 RESULTS_DIR :=
 CHECK_GOFMT_FLAGS := -e -s -l
 IMPLEMENTS_OPTS :=
@@ -76,7 +76,7 @@ test-docker: test-container
 test-container: $(BUILDFILE) $(RESULTS_DIR)
 	$(CONTAINER_CMD) run $(CONTAINER_OPTS) --rm --hostname test_ceph_aio \
 		-v $(CURDIR):/go/src/github.com/ceph/go-ceph$(VOLUME_FLAGS) $(RESULTS_VOLUME) $(GOCACHE_VOLUME) \
-		$(CI_IMAGE_TAG) $(ENTRYPOINT_ARGS)
+		$(CI_IMAGE_TAG) --test-pkg="rbd/admin"
 test-multi-container: $(BUILDFILE) $(RESULTS_DIR)
 	-$(MAKE) test-containers-kill
 	-$(MAKE) test-containers-rm-volumes

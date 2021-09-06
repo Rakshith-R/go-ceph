@@ -3,8 +3,8 @@
 package admin
 
 import (
+	"fmt"
 	"testing"
-	"time"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
@@ -35,43 +35,54 @@ func TestMirrorSnapshotScheduleStatus(t *testing.T) {
 	assert.NoError(t, err)
 	err = img.MirrorEnable(rbd.ImageMirrorModeSnapshot)
 	assert.NoError(t, err)
-	assert.NoError(t, img.Close())
+	// assert.NoError(t, img.Close())
 
 	ra := getAdmin(t)
-	scheduler := ra.MirrorSnashotSchedule()
-	err = scheduler.Add(
-		NewLevelSpec(defaultPoolName, "", imgName),
-		Interval("1d"),
-		NoStartTime)
-	assert.NoError(t, err)
-	defer func() {
-		err = scheduler.Remove(
-			NewLevelSpec(defaultPoolName, "", imgName),
-			Interval("1d"),
-			NoStartTime)
-		assert.NoError(t, err)
-	}()
+	taskAdmin := ra.Task()
+	res, err := taskAdmin.AddFlatten(NewImageSpec("", "", imgName))
+	fmt.Println(err)
+	assert.Error(t, err)
+	fmt.Println(res)
+	id, err := img.GetId()
+	fmt.Println(id, err)
+	fmt.Println(img.Trash(0))
+	res, err = taskAdmin.AddTrashRemove(NewImageIdSpec("", "", id))
+	fmt.Println(res, err)
+	fmt.Println(taskAdmin.List())
+	// scheduler := ra.MirrorSnashotSchedule()
+	// err = scheduler.Add(
+	// 	NewLevelSpec(defaultPoolName, "", imgName),
+	// 	Interval("1d"),
+	// 	NoStartTime)
+	// assert.NoError(t, err)
+	// defer func() {
+	// 	err = scheduler.Remove(
+	// 		NewLevelSpec(defaultPoolName, "", imgName),
+	// 		Interval("1d"),
+	// 		NoStartTime)
+	// 	assert.NoError(t, err)
+	// }()
 
-	// This is one of those calls that depends on something async inside ceph
-	// and doesn't return the "expected result" immediately after the schedule
-	// is added. Loop on it for a while checking for the desired condition to
-	// become true.
-	// Unfortunately, this particular case is quite slow and doesn't
-	// seem to be ready until around a minute(!).
-	var status []ScheduledImage
-	for i := 0; i < 100; i++ {
-		status, err = scheduler.Status(
-			NewLevelSpec(defaultPoolName, "", imgName))
-		assert.NoError(t, err)
-		if len(status) == 1 {
-			break
-		}
-		time.Sleep(1 * time.Second)
-	}
-	if assert.Len(t, status, 1) {
-		assert.Equal(t, "rbd/img1", status[0].Image)
-		// we don't bother asserting the ScheduleTime value because
-		// it changes - and it's not worth messing with the system
-		// clock just for this kind of test.
-	}
+	// // This is one of those calls that depends on something async inside ceph
+	// // and doesn't return the "expected result" immediately after the schedule
+	// // is added. Loop on it for a while checking for the desired condition to
+	// // become true.
+	// // Unfortunately, this particular case is quite slow and doesn't
+	// // seem to be ready until around a minute(!).
+	// var status []ScheduledImage
+	// for i := 0; i < 100; i++ {
+	// 	status, err = scheduler.Status(
+	// 		NewLevelSpec(defaultPoolName, "", imgName))
+	// 	assert.NoError(t, err)
+	// 	if len(status) == 1 {
+	// 		break
+	// 	}
+	// 	time.Sleep(1 * time.Second)
+	// }
+	// if assert.Len(t, status, 1) {
+	// 	assert.Equal(t, "rbd/img1", status[0].Image)
+	// 	// we don't bother asserting the ScheduleTime value because
+	// 	// it changes - and it's not worth messing with the system
+	// 	// clock just for this kind of test.
+	// }
 }
