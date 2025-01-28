@@ -371,6 +371,9 @@ test_go_ceph() {
     esac
     export GO_CEPH_TEST_ALT_FS_NAME
 
+    show go vet -tags=main,ceph_main,ceph_preview ./rbd
+    show go test -timeout 15m -v -count=1 -tags=main,ceph_main,ceph_preview -covermode=count -coverprofile=rbd.cover.out -coverpkg=github.com/ceph/go-ceph/rbd -o ./rbd/rbd.test ./rbd
+
     for pkg in "${pkgs[@]}"; do
         test_pkg "${pkg}" || test_failed "${pkg}"
     done
