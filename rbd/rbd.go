@@ -1022,7 +1022,7 @@ func (image *Image) SetSnapshotByID(snapID uint64) error {
 		return err
 	}
 
-	return getError(C.rbd_snap_set_by_id(image.image, C.unint64_t(snapID)))
+	return getError(C.rbd_snap_set_by_id(image.image, C.uint64_t(snapID)))
 }
 
 // GetTrashList returns a slice of TrashInfo structs, containing information about all RBD images
