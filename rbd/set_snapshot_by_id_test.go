@@ -20,8 +20,8 @@ func TestSetSnapshotByID(t *testing.T) {
 
 	name := GetUUID()
 	snapName := fmt.Sprintf("snap-%s", GetUUID())
-	cloneName := fmt.Sprint("clone-%s", GetUUID())
-	groupName := fmt.Sprint("group-%s", GetUUID())
+	cloneName := fmt.Sprintf("clone-%s", GetUUID())
+	groupName := fmt.Sprintf("group-%s", GetUUID())
 	options := NewRbdImageOptions()
 	assert.NoError(t,
 		options.SetUint64(ImageOptionOrder, uint64(testImageOrder)))
