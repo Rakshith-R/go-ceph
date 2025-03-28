@@ -19,9 +19,9 @@ func TestSetSnapshotByID(t *testing.T) {
 	require.NoError(t, err)
 
 	name := GetUUID()
-	snapName := fmt.Sprintf("snap-", GetUUID())
-	cloneName := fmt.Sprint("clone-", GetUUID())
-	groupName := fmt.Sprint("group-", GetUUID())
+	snapName := fmt.Sprintf("snap-%s", GetUUID())
+	cloneName := fmt.Sprint("clone-%s", GetUUID())
+	groupName := fmt.Sprint("group-%s", GetUUID())
 	options := NewRbdImageOptions()
 	assert.NoError(t,
 		options.SetUint64(ImageOptionOrder, uint64(testImageOrder)))
